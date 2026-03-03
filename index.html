@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JSONL Sort</title>
+</head>
+<body>
+  <h3>JSONL Sort</h3>
+
+  <label>Sort key:</label>
+  <input id="sortKey" type="text" value="name">
+  <br><br>
+
+  <textarea id="input" rows="10" cols="60">{id:"1", name:"Alice"}
+{id:"3", name:"carl"}
+{id:"2", name:"bob"}</textarea>
+
+  <br><br>
+
+  <button id="runBtn">Sort</button>
+
+  <pre id="output"></pre>
+
+  <script src="jsonl.js"></script>
+  <script>
+    let wasm;
+
+    jsonl({
+      print: function(text) {
+        const out = document.getElementById("output");
+        out.textContent += text + "\n";
+      }
+    }).then(function(Module) {
+      wasm = Module;
+    });
+
+    document.getElementById("runBtn").onclick = function() {
+      const input = document.getElementById("input").value;
+      const key = document.getElementById("sortKey").value;
+      const out = document.getElementById("output");
+      out.textContent = "";
+
+      // Call the C function; input/output handled via print
+      wasm.ccall('process', 'void', ['string', 'number', 'string'], [input, input.length, key]);
+    };
+  </script>
+</body>
+</html>
