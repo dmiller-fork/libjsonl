@@ -10,9 +10,8 @@ int main()
 	rows[0] = &buff[0];
 	rows[1] = &buff[23];
 	rows[2] = &buff[45];
-	char* key = "name";
-	jsonl_sort(rows, key, 3);
-	for(int i = 0; i<3; i++)
-		printf("rows[%d]: %s\n", i, rows[i]);
+	char* key = "id";
+	float total = jsonl_sum(rows, key, 3);
+	printf("{sum_key: %s, total: %6.2f}\n", key, total);
 	return(0);
 }

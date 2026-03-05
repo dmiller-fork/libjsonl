@@ -2,4 +2,5 @@
 #define LIBJSONL_H
 void jsonl_getval(char* line, const char* key, char val[], int val_size);
 void jsonl_sort(char* rows[], const char* sort_key, int rows_nlines);
+float jsonl_sum(char* rows[], const char* sum_key, int rows_nlines);
 #endif 

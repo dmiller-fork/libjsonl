@@ -1,29 +1,45 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -std=c11
 
-LIBSRC = libjsonl.c libs/libkr.c
-CMD_BINS = jsonl_sort
-TEST_SRC = $(wildcard tests/*_test.c)
-TEST_BINS = $(TEST_SRC:.c=)
+DEPS = libjsonl.c libs/libkr.c
 
-jsonl_sort:
-	$(CC) $(CFLAGS) cmds/jsonl_sort.c $(LIBSRC) -o jsonl_sort
+all: sum-test sort-test getval-test print-test
 
-run_all: $(TEST_BINS)
-	@for t in $(TEST_BINS); do \
-		echo "Running $$t"; \
-		./$$t || exit 1; \
-	done
+sum-test: tests/sum-test.c $(DEPS)
+	$(CC) $(CFLAGS) tests/sum-test.c $(DEPS) -o sum-test
 
-tests/%_test: tests/%_test.c
-	$(CC) $(CFLAGS) $< $(LIBSRC) -o $@
+sort-test: tests/sort-test.c $(DEPS)
+	$(CC) $(CFLAGS) tests/sort-test.c $(DEPS) -o sort-test
+
+getval-test: tests/getval-test.c $(DEPS)
+	$(CC) $(CFLAGS) tests/getval-test.c $(DEPS) -o getval-test
+
+print-test: tests/print-test.c $(DEPS)
+	$(CC) $(CFLAGS) tests/print-test.c $(DEPS) -o print-test
+
+run_sum: sum-test
+	./sum-test
+
+run_sort: sort-test
+	./sort-test
+
+run_getval: getval-test
+	./getval-test
+
+run_print: print-test
+	echo "hello world" | ./print-test
+
+run_all: run_sum run_sort run_getval run_print
 
 clean:
-	rm -f $(CMD_BINS) $(TEST_BINS)
+	rm -f sum-test sort-test getval-test print-test
+
+.PHONY: all run_sum run_sort run_getval run_print run_all clean
 
 EMCC = emcc
-EFLAGS = -O2 -sEXPORT_NAME=jsonl \
-         -sEXPORTED_FUNCTIONS=_process \
+EFLAGS = -O2 \
+         -sEXPORT_NAME=jsonl \
+         -sEXPORTED_FUNCTIONS=_jsonl_wasm_sort,_jsonl_wasm_sum \
          -sEXPORTED_RUNTIME_METHODS=ccall,cwrap \
          -sMODULARIZE \
          -sENVIRONMENT=web
@@ -33,7 +49,3 @@ OUT = jsonl.js
 
 wasm: $(SRC)
 	$(EMCC) $(SRC) $(EFLAGS) -o $(OUT)
-
-
-
-

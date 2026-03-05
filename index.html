@@ -1,48 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>JSONL Sort</title>
+<meta charset="utf-8">
+<title>JSONL Tool</title>
 </head>
 <body>
-  <h3>JSONL Sort</h3>
 
-  <label>Sort key:</label>
-  <input id="sortKey" type="text" value="name">
-  <br><br>
+<h3>JSONL Tool</h3>
 
-  <textarea id="input" rows="10" cols="60">{id:"1", name:"Alice"}
+<label>Mode:</label>
+<select id="mode">
+  <option value="sort">Sort</option>
+  <option value="sum">Sum</option>
+</select>
+
+<br><br>
+
+<label>Key:</label>
+<input id="key" type="text" value="id">
+
+<br><br>
+
+<textarea id="input" rows="10" cols="60">{id:"1", name:"Alice"}
 {id:"3", name:"carl"}
 {id:"2", name:"bob"}</textarea>
 
-  <br><br>
+<br><br>
 
-  <button id="runBtn">Sort</button>
+<button id="runBtn">Run</button>
 
-  <pre id="output"></pre>
+<pre id="output"></pre>
 
-  <script src="jsonl.js"></script>
-  <script>
-    let wasm;
+<script src="jsonl.js"></script>
 
-    jsonl({
-      print: function(text) {
-        const out = document.getElementById("output");
-        out.textContent += text + "\n";
-      }
-    }).then(function(Module) {
-      wasm = Module;
-    });
+<script>
+let wasm;
 
-    document.getElementById("runBtn").onclick = function() {
-      const input = document.getElementById("input").value;
-      const key = document.getElementById("sortKey").value;
-      const out = document.getElementById("output");
-      out.textContent = "";
+jsonl({
+  print: function(text) {
+    const out = document.getElementById("output");
+    out.textContent += text + "\n";
+  }
+}).then(function(Module) {
+  wasm = Module;
+});
 
-      // Call the C function; input/output handled via print
-      wasm.ccall('process', 'void', ['string', 'number', 'string'], [input, input.length, key]);
-    };
-  </script>
+document.getElementById("runBtn").onclick = function() {
+  const input = document.getElementById("input").value;
+  const key = document.getElementById("key").value;
+  const mode = document.getElementById("mode").value;
+
+  const out = document.getElementById("output");
+  out.textContent = "";
+
+  if (mode === "sort") {
+    wasm.ccall(
+      'jsonl_wasm_sort',
+      'void',
+      ['string','number','string'],
+      [input, input.length, key]
+    );
+  } else if (mode === "sum") {
+    wasm.ccall(
+      'jsonl_wasm_sum',
+      'void',
+      ['string','number','string'],
+      [input, input.length, key]
+    );
+  }
+};
+</script>
+
 </body>
 </html>

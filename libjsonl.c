@@ -83,3 +83,14 @@ void jsonl_sort(char* rows[], const char* sort_key, int rows_nlines)
             }
     return;
 }
+float jsonl_sum(char* rows[], const char* sum_key, int rows_nlines)
+{
+	int i;
+	float total = 0.0;
+	char source[LEN];
+	for(i = 0; i < rows_nlines; i++){
+		jsonl_getval(rows[i], sum_key, source, LEN);
+		total += kr_atof(source);
+	}
+	return total;
+}
