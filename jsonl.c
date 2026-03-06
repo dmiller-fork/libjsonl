@@ -51,3 +51,26 @@ void jsonl_wasm_sum(const char* buf, int len, const char* sum_key) {
 
     printf("{%s: %6.2f}\n", sum_key, total);
 }
+
+void jsonl_wasm_filter(const char* buf, int len, const char* filter_key, const char* filter_val) {
+    // Copy to a mutable buffer
+    static char buffer[65536]; // big enough for your input
+    if (len >= sizeof(buffer)) len = sizeof(buffer)-1;
+    memcpy(buffer, buf, len);
+    buffer[len] = '\0';
+
+    int nlines = 0;
+    lineptr[nlines++] = buffer;
+    for (int i = 0; i < len; i++) {
+        if (buffer[i] == '\n') {
+            buffer[i] = '\0';
+            if (nlines < MAXLINES)
+                lineptr[nlines++] = &buffer[i+1];
+        }
+    }
+
+    int size = jsonl_filter(lineptr, filter_key, filter_val, nlines);
+
+    for (int i = 0; i < size; i++)
+        printf("%s\n", lineptr[i]);
+}

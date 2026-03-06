@@ -10,14 +10,18 @@
 
 <label>Mode:</label>
 <select id="mode">
-  <option value="sort">Sort</option>
-  <option value="sum">Sum</option>
+	<option value="sort">Sort</option>
+	<option value="sum">Sum</option>
+	<option value="filter">Filter</option>
 </select>
 
 <br><br>
 
 <label>Key:</label>
 <input id="key" type="text" value="id">
+
+<label>Val:</label>
+<input id="val" type="text" value="2">
 
 <br><br>
 
@@ -49,6 +53,7 @@ document.getElementById("runBtn").onclick = function() {
   const input = document.getElementById("input").value;
   const key = document.getElementById("key").value;
   const mode = document.getElementById("mode").value;
+	const val = document.getElementById("val").value;
 
   const out = document.getElementById("output");
   out.textContent = "";
@@ -67,7 +72,14 @@ document.getElementById("runBtn").onclick = function() {
       ['string','number','string'],
       [input, input.length, key]
     );
-  }
+  } else if (mode === "filter") {
+    wasm.ccall(
+      'jsonl_wasm_filter',
+      'int',
+      ['string','number','string', 'string'],
+      [input, input.length, key, val]
+    );
+  } 
 };
 </script>
 

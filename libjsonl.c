@@ -73,8 +73,6 @@ void jsonl_sort(char* rows[], const char* sort_key, int rows_nlines)
             for(j = i-gap; j>=0; j-=gap){
                 jsonl_getval(rows[j],sort_key, source, LEN);
                 jsonl_getval(rows[j+gap],sort_key, target, LEN);
-				//printf("source: %s\n", source);
-				//printf("target: %s\n", target);
                 if(kr_strcmp(source,target) <= 0)
                     break;
                 temp = rows[j];
@@ -93,4 +91,21 @@ float jsonl_sum(char* rows[], const char* sum_key, int rows_nlines)
 		total += kr_atof(source);
 	}
 	return total;
+}
+
+int jsonl_filter(char* rows[], const char* filter_key, const char* filter_val, int row_nlines)
+{
+    int i = 0;
+    char source[LEN];
+
+    for (int j = 0; j < row_nlines; j++) {
+        jsonl_getval(rows[j], filter_key, source, LEN);
+
+        if (!kr_strcmp(source, filter_val)) {
+            rows[i++] = rows[j];
+        }
+    }
+
+    rows[i] = NULL;
+    return i;
 }
