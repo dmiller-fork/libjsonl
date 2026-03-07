@@ -13,6 +13,7 @@
 	<option value="sort">Sort</option>
 	<option value="sum">Sum</option>
 	<option value="filter">Filter</option>
+	<option value="join">Join</option>
 </select>
 
 <br><br>
@@ -20,8 +21,10 @@
 <label>Key:</label>
 <input id="key" type="text" value="id">
 
+<span id="valBox" style="display:none;">
 <label>Val:</label>
 <input id="val" type="text" value="2">
+</span>
 
 <br><br>
 
@@ -29,11 +32,26 @@
 {id:"3", name:"carl"}
 {id:"2", name:"bob"}</textarea>
 
-<br><br>
-
+<span id="joinBox" style="display:none;">
+<textarea id="input2" rows="10" cols="60">{id:"1", name:"Alice"}
+{id:"3", name:"carl"}
+{id:"2", name:"bob"}</textarea>
+</span>
+<div style="display:block">
 <button id="runBtn">Run</button>
+</div>
 
 <pre id="output"></pre>
+
+<script>
+const mode = document.getElementById("mode");
+const valBox = document.getElementById("valBox");
+
+mode.addEventListener("change", function () {
+	valBox.style.display = (mode.value === "filter") ? "inline" : "none";
+	joinBox.style.display = (mode.value === "join") ? "inline" : "none";
+});
+</script>
 
 <script src="jsonl.js"></script>
 
@@ -51,6 +69,7 @@ jsonl({
 
 document.getElementById("runBtn").onclick = function() {
   const input = document.getElementById("input").value;
+  const input2 = document.getElementById("input2").value;
   const key = document.getElementById("key").value;
   const mode = document.getElementById("mode").value;
 	const val = document.getElementById("val").value;
@@ -78,6 +97,13 @@ document.getElementById("runBtn").onclick = function() {
       'int',
       ['string','number','string', 'string'],
       [input, input.length, key, val]
+    );
+  } else if (mode === "join") {
+    wasm.ccall(
+      'jsonl_wasm_join',
+      'int',
+      ['string', 'string', 'number', 'number', 'string'],
+      [input, input2, input.length, input2.length, key]
     );
   } 
 };

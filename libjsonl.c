@@ -109,3 +109,25 @@ int jsonl_filter(char* rows[], const char* filter_key, const char* filter_val, i
     rows[i] = NULL;
     return i;
 }
+
+int jsonl_join(char* rows1[], char* rows2[], 
+	const char* join_key,
+	int row1_nlines, int row2_nlines,
+	char* join_rows[][2])
+{
+	int i, j, k;
+	char source[LEN], target[LEN];
+	k = 0;
+	for(i=0; i < row1_nlines; i++){
+        jsonl_getval(rows1[i], join_key, source, LEN); //get val1
+        for(j=0; j<row2_nlines; j++){
+            jsonl_getval(rows2[j], join_key, target, LEN); //getval2
+            if(!kr_strcmp(source, target)){
+				join_rows[k][0] = rows1[i];
+				join_rows[k][1] = rows2[j];
+				k++;
+            }
+        }
+    }
+	return k;
+}
